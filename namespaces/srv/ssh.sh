@@ -1,10 +1,6 @@
 # ssh
 ssh_orb=(
 	"Run command on remote"
-
-	1 = subpath
-		In: production staging nginx adminer
-		Required: false
 	-t = tty 
 		Default: true
 	-u 1 = user 
@@ -14,8 +10,7 @@ ssh_orb=(
 		Default: IfPresent: '$ORB_SRV_DOMAIN'	
 		Required: true
 	-P 1 = path 
-		Default: IfPresent: '$ORB_SRV_REPO_PATH'
-		Required: true
+		Default: '~'
 	-p 1 = port 
 		Default: IfPresent: '$ORB_SRV_PORT'
 	... = input_cmd
@@ -25,13 +20,10 @@ function ssh() {
 	cmd=( /bin/ssh )
 	orb_pass -a cmd -- -tp
 
-	cmd+=(
-		"${ORB_SRV_USER}@${ORB_SRV_DOMAIN}" PATH="\$PATH:~/.orb/orb"\;
-		cd "$path/$subpath" '&&'
-	)
+	cmd+=("${user}@${domain}")
 
 	orb_pass -a cmd -- ...
-	[[ -n "${input_cmd[@]}" ]] || cmd+=( /bin/bash )
+	# [[ -n "${input_cmd[@]}" ]] || cmd+=( /bin/bash )
 
 	"${cmd[@]}"
 }
@@ -43,21 +35,19 @@ mount_orb=(
 	"Mount remote to _remote"
 )
 function mount() {
-	if [ -d _remote ]; then
-		sshfs -o follow_symlinks ${ORB_SRV_USER}@${ORB_SRV_DOMAIN}:${ORB_SRV_REPO_PATH} _remote
-	else
-		echo 'No _remote'
-	fi
+	[ -d _remote ] || mkdir _remote
+	sshfs -o follow_symlinks "${ORB_SRV_USER}@${ORB_SRV_DOMAIN}:/home/$ORB_SRV_USER/" _remote
 }
 
-umountremote_orb=(
+umount_orb=(
 	"Umount _remote"
 )
 function umount() {
-	umount -l _remote
+	# umount -l _remote
+	/bin/umount _remote
 }
 
-updateremotecli_orb=(
+updatecli_orb=(
 	"Update remote orb"
 )
 function updatecli() {

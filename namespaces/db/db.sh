@@ -83,7 +83,7 @@ SQL
   # 	orb run -s db
 	# docker exec -i ${APP_NAME}_dev_db psql -U postgres -d ${APP_NAME}_development < db_dump_prod.sql &> /dev/null
 
-	# orb bash -s db "psql -U $DATABASE_USERNAME ${APP_NAME}_development -c \"$sql\"" &> /dev/null
+	# orb sh -s db "psql -U $DATABASE_USERNAME ${APP_NAME}_development -c \"$sql\"" &> /dev/null
 	# docker exec -i ${APP_NAME}_dev_db psql -U postgres -d ${APP_NAME}_development < db_dump_prod.sql &> /dev/null
 }
 

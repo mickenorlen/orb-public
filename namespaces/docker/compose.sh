@@ -11,8 +11,8 @@ start_orb=(
 	-r = restart "stop first"
 	-d = daemon
 		Default: true
-	-d- = compose_opts "docker-compose opts"
-	-o- = up_opts "docker-compose up options"
+	-d- = compose_opts "docker compose opts"
+	-o- = up_opts "docker compose up options"
 );
 function start() {
 	$restart && orb_pass orb docker stop -- -es
@@ -34,8 +34,8 @@ config_orb=(
 		Default: IfPresent: '$ORB_DEFAULT_ENV || development'
 		In: production staging development
 	-i = idle
-	-d- = compose_opts "docker-compose opts"
-	-o- = up_opts "docker-compose up options"
+	-d- = compose_opts "docker compose opts"
+	-o- = up_opts "docker compose up options"
 );
 function config() {
 	local cmd=($(orb_pass orb docker compose_cmd -- -ei -d-))
@@ -54,8 +54,8 @@ stop_orb=(
 		Default: IfPresent: '$ORB_DEFAULT_ENV || development'
 		In: production staging development
 	-s 1 = service "start single service"
-	-d- = compose_opts "docker-compose opts"
-	-o- = up_opts "docker-compose up options"
+	-d- = compose_opts "docker compose opts"
+	-o- = up_opts "docker compose up options"
 );
 function stop() {
 	local cmd=($(orb_pass orb docker compose_cmd -- -e -d-))
@@ -80,8 +80,8 @@ logs_orb=(
 		Default: true
 	-l 1 = lines
 		Default: 300
-	-d- = compose_opts "docker-compose opts"
-	-o- = up_opts "docker-compose up options"
+	-d- = compose_opts "docker compose opts"
+	-o- = up_opts "docker compose up options"
 );
 function logs() {
 	local cmd=($(orb_pass orb docker compose_cmd -- -e -d-))
@@ -100,7 +100,7 @@ clearlogs_orb=(
 		In: production staging development
 	-s 1 = service
 		Required: true
-	-d- = compose_opts "docker-compose opts"
+	-d- = compose_opts "docker compose opts"
 );
 function clearlogs() { #
 	local id=$(orb_pass orb docker service_id -- -es -d-)
@@ -115,7 +115,7 @@ rm_orb=(
 		Default: IfPresent: '$ORB_DEFAULT_ENV || development'
 		In: production staging development
 	-s 1 = service 'rm single service'
-	-d- = compose_opts 'docker-compose options'
+	-d- = compose_opts 'docker compose options'
 	-o- = rm_opts 'compose rm options'
 	--force = force
 		Default: true
@@ -137,7 +137,7 @@ pull_orb=(
 	-e 1 = env
 		Default: IfPresent: '$ORB_DEFAULT_ENV || development'
 		In: production staging development
-	-d- = compose_opts 'docker-compose options'
+	-d- = compose_opts 'docker compose options'
 	-o- = pull_opts 'compose pull options'
 ); 
 function pull() {
@@ -159,7 +159,7 @@ service_id_orb=(
 	-s 1 = service 'service to id'
 		Default: IfPresent: '$ORB_DEFAULT_SERVICE'
 		Required: true
-	-d- = compose_opts 'docker-compose options'
+	-d- = compose_opts 'docker compose options'
 	-o- = ps_opts 'compose ps -q options'
 ); 
 function service_id() {
@@ -170,9 +170,9 @@ function service_id() {
 	"${cmd[@]}"
 }
 
-# bash
-bash_orb=(
-	"Enter container with bash or exec/run cmd"
+# sh
+sh_orb=(
+	"Enter container shell or exec cmd"
 
 	-e 1 = env
 		Default: IfPresent: '$ORB_DEFAULT_ENV || development'
@@ -186,11 +186,11 @@ bash_orb=(
 		Default: true
 	-i = interactive "interactive, disable if job management error"
 		Default: true
-	-d- = compose_opts "docker-compose options"
+	-d- = compose_opts "docker compose options"
 	... = input_cmd
 		Required: false
 ); 
-function bash() {
+function sh() {
 	# detached
 	local cmd=()
 
@@ -206,12 +206,13 @@ function bash() {
 		cmd+=( "$(orb_pass orb docker service_id -- -es -d-)")
 	fi
 
-	local bash_flags="-c"
-	$interactive && bash_flags+="i"
+	local sh_flags="-c"
+	$interactive && sh_flags+="i"
 
-	# bash
-	local bash_cmd=$([[ -n ${input_cmd[@]} ]] && echo "$bash_flags \"${input_cmd[@]}\"")
-	cmd+=( /bin/sh $bash_flags "[ -f /bin/bash ] && bash $bash_cmd || sh $bash_cmd" )
+	local bash_or_sh_cmd=( "\$(which bash || which sh)" )
+	[[ -n $input_cmd ]] && bash_or_sh_cmd+=( $sh_flags \"${input_cmd[@]}\" 
+	)
+	cmd+=( sh -c "${bash_or_sh_cmd[*]}" )
 	orb_pass -x orb docker set_current_env -- -e
 	
 	"${cmd[@]}"
@@ -234,15 +235,15 @@ compose_cmd_orb=(
 	-d- = compose_opts_add
 ); function compose_cmd() {
 	local cmd=()
-	orb_pass -va cmd docker-compose -- -o- -d-
+	orb_pass -va cmd docker compose -- -o- -d-
 
 	if [[ -z "${compose_opts_override[@]}" ]]; then
-		if [[ -f "docker-compose.$env.yml" ]]; then
-			cmd+=( -f docker-compose.yml -f docker-compose.$env.yml )
+		if [[ -f "docker compose.$env.yml" ]]; then
+			cmd+=( -f docker compose.yml -f docker compose.$env.yml )
 
 			if $idle; then
-				[[ -f "docker-compose.idle.yml" ]] && \
-				cmd+=( -f docker-compose.idle.yml )
+				[[ -f "docker compose.idle.yml" ]] && \
+				cmd+=( -f docker compose.idle.yml )
 			fi
 		fi
 	fi
