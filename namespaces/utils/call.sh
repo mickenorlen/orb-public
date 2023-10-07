@@ -1,7 +1,7 @@
-call_orb=(
-  "Call command in orb context"
+eval_orb=(
+  "Eval command in orb context"
   ... = cmd
 )
-function call() {
-  "${cmd[*]}" 
+function eval() {
+  eval "${cmd[@]}" 
 }
