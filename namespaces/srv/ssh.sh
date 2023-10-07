@@ -47,9 +47,11 @@ function umount() {
 	/bin/umount _remote
 }
 
-updatecli_orb=(
+pullorb_orb=(
 	"Update remote orb"
 )
-function updatecli() {
-	orb docker ssh -p ".orb" "orb git pullall"
+function pullorb() {
+	orb ssh git -C \~/orb/orb-cli pull '&&' \
+		[ -d \~/orb/home/.git \] && git -C \~/orb/home pull '&&' \
+		[ -d \~/orb/public/.git \] git -C \~/orb/public pull
 }
