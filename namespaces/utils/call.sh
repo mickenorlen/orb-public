@@ -3,5 +3,5 @@ call_orb=(
   ... = cmd
 )
 function call() {
-  bash -c "${cmd[*]}" 
+  "${cmd[*]}" 
 }
