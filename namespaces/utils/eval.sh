@@ -3,5 +3,5 @@ eval_orb=(
   ... = cmd
 )
 function eval() {
-  eval "${cmd[@]}" 
+  builtin eval "${cmd[@]}" 
 }
