@@ -52,6 +52,6 @@ pullorb_orb=(
 )
 function pullorb() {
 	orb ssh git -C \~/orb/orb-cli pull '&&' \
-		[ -d \~/orb/home/.git \] && git -C \~/orb/home pull '&&' \
-		[ -d \~/orb/public/.git \] git -C \~/orb/public pull
+		[ -d \~/orb/home/.git \] '&&' git -C \~/orb/home pull \; \
+		[ -d \~/orb/public/.git \] '&&' git -C \~/orb/public pull
 }
