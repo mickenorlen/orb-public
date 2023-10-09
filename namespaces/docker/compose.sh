@@ -238,12 +238,12 @@ compose_cmd_orb=(
 	orb_pass -va cmd docker compose -- -o- -d-
 
 	if [[ -z "${compose_opts_override[@]}" ]]; then
-		if [[ -f "docker_compose.$env.yml" ]]; then
-			cmd+=( -f docker compose.yml -f docker compose.$env.yml )
+		if [[ -f "docker-compose.$env.yml" ]]; then
+			cmd+=( -f docker-compose.yml -f docker-compose.$env.yml )
 
 			if $idle; then
-				[[ -f "docker_compose.idle.yml" ]] && \
-				cmd+=( -f docker compose.idle.yml )
+				[[ -f "docker-compose.idle.yml" ]] && \
+				cmd+=( -f docker-compose.idle.yml )
 			fi
 		fi
 	fi
