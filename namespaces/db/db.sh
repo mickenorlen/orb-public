@@ -13,7 +13,7 @@ dump_orb=(
     Default: Help: '$ORB_APP_NAME_$env'
   -f = force
   -p 1 = project_path 'Folder relative from project root'
-    Default: _dumps
+    Default: '../db_dumps'
 ); function dump() {
   [[ -z $dbname ]] && dbname="${ORB_APP_NAME}_$env"
 
