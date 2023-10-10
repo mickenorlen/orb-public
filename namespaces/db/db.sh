@@ -18,7 +18,7 @@ dump_orb=(
   [[ -z $dbname ]] && dbname="${ORB_APP_NAME}_$env"
 
   local cmd=()
-  orb_pass -a cmd orb docker bash +t +i -- -es
+  orb_pass -a cmd orb docker sh +t +i -- -es
   local cmd+=( 
     su $dbuser -c "postgres > /dev/null 2>&1 & sleep 2s &&
     pg_dump --no-owner --no-acl -U $dbuser $dbname" 
@@ -67,12 +67,12 @@ SQL
 )
 
   local empty_cmd=()
-  orb_pass -a empty_cmd orb docker bash -- -es
+  orb_pass -a empty_cmd orb docker sh -- -es
   empty_cmd+=( "psql -U $dbuser $dbname -c '$empty_sql'" )
   
 
   local load_cmd=()
-  orb_pass -a load_cmd orb docker bash +t -- -es
+  orb_pass -a load_cmd orb docker sh +t -- -es
   load_cmd+=( "psql -U $dbuser -d ${ORB_APP_NAME}_$out_env" )
   
   local output
