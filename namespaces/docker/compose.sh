@@ -15,6 +15,8 @@ start_orb=(
 	-o- = up_opts "docker compose up options"
 );
 function start() {
+	docker ps > /dev/null 2>&1 || sudo systemctl start docker
+
 	$restart && orb_pass orb docker stop -- -es
 
 	local cmd=($(orb_pass orb docker compose_cmd -- -ei -d-))
@@ -24,6 +26,8 @@ function start() {
 	orb_pass -x orb docker set_current_env -- -e
 
 	"${cmd[@]}"
+	
+	$idle && find /tmp -maxdepth 1 -mindepth 1 -name 'orb-docker-compose.idle.yml*' -exec rm {} \;
 }
 
 # start
@@ -242,13 +246,33 @@ compose_cmd_orb=(
 			cmd+=( -f docker-compose.yml -f docker-compose.$env.yml )
 
 			if $idle; then
-				[[ -f "docker-compose.idle.yml" ]] && \
-				cmd+=( -f docker-compose.idle.yml )
+				local tmp="$(build_idle_yml $ORB_DEFAULT_SERVICE)"
+				cmd+=( -f "$tmp" )
 			fi
 		fi
 	fi
 
+
 	echo "${cmd[@]}" # return cmd to stdout
+}
+
+build_idle_yml() {
+  [ $# == 0 ] && orb_raise_error  "No service provided"
+  local services=("$@")
+  local idle_msg="Started idle"
+  local idle_cmd="sh -c \"echo $idle_msg && tail -f /dev/null\""
+
+  local output_file="$(mktemp /tmp/orb-docker-compose.idle.yml.XXXXXX)"
+
+  local service content="services:"
+  for service in "${services[@]}"; do
+    content+="
+  ${service}:
+    command: $idle_cmd"
+  done
+
+  echo -e "$content" > "$output_file"
+  echo "$output_file"
 }
 
 # set_current_env

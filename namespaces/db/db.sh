@@ -23,7 +23,9 @@ dump_orb=(
     su $dbuser -c "postgres > /dev/null 2>&1 & sleep 2s &&
     pg_dump --no-owner --no-acl -U $dbuser $dbname" 
   )
-
+  
+  mkdir -p "$project_path"
+  
   "${cmd[@]}" > "$project_path/db_dump_$env.sql"
 }
 
