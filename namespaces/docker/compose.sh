@@ -93,7 +93,7 @@ function logs() {
 	cmd+=(--tail "$lines" $service)
 	orb_pass -x orb docker set_current_env -- -e
 
-	echo "${cmd[@]}"
+	"${cmd[@]}"
 }
 
 # clearlogs
