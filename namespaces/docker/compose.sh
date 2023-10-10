@@ -93,7 +93,7 @@ function logs() {
 	cmd+=(--tail "$lines" $service)
 	orb_pass -x orb docker set_current_env -- -e
 
-	"${cmd[@]}"
+	echo "${cmd[@]}"
 }
 
 # clearlogs
@@ -238,8 +238,10 @@ compose_cmd_orb=(
 		Default: IfPresent: '$COMPOSE_OPTIONS_OVERRIDE'
 	-d- = compose_opts_add
 ); function compose_cmd() {
-	local cmd=()
-	orb_pass -va cmd docker compose -- -o- -d-
+	local cmd=() compose_cmd="docker compose"
+	which docker-compose >/dev/null && compose_cmd=docker-compose
+
+	orb_pass -va cmd $compose_cmd -- -o- -d-
 
 	if [[ -z "${compose_opts_override[@]}" ]]; then
 		if [[ -f "docker-compose.$env.yml" ]]; then
@@ -251,7 +253,6 @@ compose_cmd_orb=(
 			fi
 		fi
 	fi
-
 
 	echo "${cmd[@]}" # return cmd to stdout
 }
