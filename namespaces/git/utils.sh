@@ -40,3 +40,13 @@ function pushall() {
 function has_uncommitted() {
   ! git diff-index --quiet HEAD --
 }
+
+save_orb=(
+  "Add, commit, push"
+  1 = commit_msg Default: Save  
+)
+function save() {
+  git add . && \
+  git commit -m "$commit_msg" && \
+  git push
+}
