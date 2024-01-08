@@ -9,8 +9,6 @@ ssh_orb=(
 	-d 1 = domain 
 		Default: IfPresent: '$ORB_SRV_DOMAIN'	
 		Required: true
-	-P 1 = path 
-		Default: '~'
 	-p 1 = port 
 		Default: IfPresent: '$ORB_SRV_PORT'
 	... = input_cmd
@@ -36,6 +34,7 @@ mount_orb=(
 )
 function mount() {
 	[ -d _remote ] || mkdir _remote
+	grep -qs "$PWD/_remote " /proc/mounts || \
 	sshfs -o follow_symlinks "${ORB_SRV_USER}@${ORB_SRV_DOMAIN}:/home/$ORB_SRV_USER/" _remote
 }
 

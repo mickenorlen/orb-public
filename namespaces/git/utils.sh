@@ -1,12 +1,14 @@
 forget_orb=(
   1 = file 'file to forget'
+  -f = force
 ); function forget() { # Completely forget file from local branch history (with confirmation prompt)
 	validate_is_repo
 	[ -e "$file" ] || orb core orb_raise_error +t "file not found"
 
 	if orb prompt confirm "Forget $file?"; then
+    $force && flags="-f"
     echo "Forgetting $file"
-    git filter-branch --index-filter "git rm -rf --cached --ignore-unmatch $file" HEAD
+    git filter-branch $flags --index-filter "git rm -rf --cached --ignore-unmatch $file" HEAD
   fi
 }
 

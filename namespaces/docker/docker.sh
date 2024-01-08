@@ -51,6 +51,7 @@ rebuild_orb=(
 function rebuild() {
 	local path
 	[ -d _docker ] && path=_docker || path=.
+	echo $ORB_BUILD_PARENT_IMAGE
 	docker build --rm --build-arg ORB_BUILD_PARENT_IMAGE="$ORB_BUILD_PARENT_IMAGE" --build-arg ORB_BUILD_ENV="$ORB_BUILD_ENV" "$path" -t "$(build_image_name)"
 }
 
