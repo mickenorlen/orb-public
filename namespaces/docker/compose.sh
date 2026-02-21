@@ -207,18 +207,47 @@ function sh() {
 	else
 		cmd+=( docker exec -i )
 		orb_pass -a cmd -- -tu
-		cmd+=( "$(orb_pass orb docker service_id -- -es -d-)")
+		
+		local service_id="$(orb_pass orb docker service_id -- -es -d- 2>/dev/null)"
+
+		if [[ -z $service_id ]]; then
+			if [ $env == development ]; then
+				# Autostart idle container in development
+				orb docker start -i -e $env
+				service_id="$(orb_pass orb docker service_id -- -es -d-)"
+			else
+				orb_raise_error "No running container for service $service"
+			fi
+		fi
+
+		cmd+=( $service_id )
 	fi
 
-	local sh_flags="-c"
-	$interactive && sh_flags+="i"
+	local flags=""
+	$interactive && flags="-i"
 
-	local bash_or_sh_cmd=( "\$(which bash || which sh)" )
-	[[ -n $input_cmd ]] && bash_or_sh_cmd+=( $sh_flags \"${input_cmd[@]}\" 
-	)
-	cmd+=( sh -c "${bash_or_sh_cmd[*]}" )
-	orb_pass -x orb docker set_current_env -- -e
-	
+	# Call correct container shell.
+	# Stay in container shell after cmd exit for development
+	local script='
+SHELL_BIN=$(command -v zsh || command -v bash || command -v sh)
+
+FLAGS="$1"
+CMD="$2"
+ENV="$3"
+
+if [ -n "$CMD" ]; then
+  if [ "$ENV" = "development" ]; then
+    exec "$SHELL_BIN" $FLAGS -c "$CMD; exec $SHELL_BIN"
+  else
+    exec "$SHELL_BIN" $FLAGS -c "$CMD"
+  fi
+else
+  exec "$SHELL_BIN" $FLAGS
+fi
+'
+
+	cmd+=( sh -c "$script" _ "$flags" "${input_cmd[*]}" "$env" )
+
 	"${cmd[@]}"
 }
 

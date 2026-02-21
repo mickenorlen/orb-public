@@ -15,7 +15,7 @@ ssh_orb=(
 		Required: false
 ); 
 function ssh() {
-	cmd=( /bin/ssh )
+	cmd=( /bin/ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 )
 	orb_pass -a cmd -- -tp
 
 	cmd+=("${user}@${domain}")

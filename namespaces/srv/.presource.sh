@@ -3,7 +3,7 @@ envorb="$(orb_get_closest_parent .env.orb)"
 
 if [[ -n  "$envorb" ]]; then
   # https://stackoverflow.com/a/4170409
-	envorb_path="${compose_file%\/*}"
+	envorb_path="${envorb%\/*}"
 	cd "$envorb_path"
 
 	# Parse .env
