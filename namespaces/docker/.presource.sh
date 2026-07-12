@@ -1,3 +1,5 @@
+source "$_orb_script_lib/helpers/file_parsing.sh"
+
 # Move to closest docker-compose
 compose_file=$(orb_get_closest_parent docker-compose.yml)
 

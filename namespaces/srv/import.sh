@@ -7,7 +7,7 @@ function import() {
   [ -d _dumps ] || mkdir _dumps
   cp _remote/${ORB_APP_NAME}/$env/_dumps/db_dump_${env}.sql _dumps/
   # orb srv umount
-  orb start -i
+  orb docker start -i
   orb db load $env
 
   # solidus active storage

@@ -79,7 +79,7 @@ SQL
   # output=
   "${empty_cmd[@]}"
   # &> /dev/null && echo -e "$(_green)db reset(_normal)" || _raise_error +t "failed to empty db - $output"
-  output=$("${load_cmd[@]}" < $project_path/db_dump_$in_env.sql) && echo -e "$(orb_green)db loaded$(orb_normal)" || orb_raise_error +t "failed to load db"
+  output=$("${load_cmd[@]}" < $project_path/db_dump_$in_env.sql) && echo -e "$(orb_green db loaded)" || orb_raise_error +t "failed to load db"
   # < db_dump_prod.sql " )
 
   # 	orb run -s db

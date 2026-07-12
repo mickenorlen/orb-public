@@ -1,3 +1,5 @@
+source "$_orb_script_lib/helpers/file_parsing.sh"
+
 # Move to closest .env.orb
 envorb="$(orb_get_closest_parent .env.orb)"
 

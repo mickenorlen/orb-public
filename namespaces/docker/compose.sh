@@ -188,6 +188,7 @@ sh_orb=(
 	-d = detached "detached, using run"
 	-t = tty
 		Default: true
+	--remain = remain
 	-i = interactive "interactive, disable if job management error"
 		Default: true
 	-d- = compose_opts "docker compose options"
@@ -233,10 +234,10 @@ SHELL_BIN=$(command -v zsh || command -v bash || command -v sh)
 
 FLAGS="$1"
 CMD="$2"
-ENV="$3"
+REMAIN="$3"
 
 if [ -n "$CMD" ]; then
-  if [ "$ENV" = "development" ]; then
+  if [ "$REMAIN" = "true" ]; then
     exec "$SHELL_BIN" $FLAGS -c "$CMD; exec $SHELL_BIN"
   else
     exec "$SHELL_BIN" $FLAGS -c "$CMD"
@@ -246,7 +247,7 @@ else
 fi
 '
 
-	cmd+=( sh -c "$script" _ "$flags" "${input_cmd[*]}" "$env" )
+	cmd+=( sh -c "$script" _ "$flags" "${input_cmd[*]}" "$remain" )
 
 	"${cmd[@]}"
 }
