@@ -19,7 +19,7 @@ dump_orb=(
 
   local cmd=()
   orb_pass -a cmd orb docker sh -d +t +i -- -es
-  local cmd+=( 
+  cmd+=( 
     su $dbuser -c "postgres > /dev/null 2>&1 & sleep 2s &&
     pg_dump --no-owner --no-acl -U $dbuser $dbname" 
   )
