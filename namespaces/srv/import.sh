@@ -2,7 +2,8 @@ import_orb=(
   1 = env
 )
 function import() {
-  orb srv ssh cd ${ORB_APP_NAME}/${env} \; orb db dump;
+  # Dont dump new for safety
+  # orb srv ssh cd ${ORB_APP_NAME}/${env} \; orb db dump;
   orb srv mount
   [ -d _dumps ] || mkdir _dumps
   cp _remote/${ORB_APP_NAME}/$env/_dumps/db_dump_${env}.sql _dumps/

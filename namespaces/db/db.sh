@@ -25,9 +25,36 @@ dump_orb=(
   )
   
   mkdir -p "$project_path"
+
+  # --- ROTATION LOGIC START ---
+  local target_file="$project_path/db_dump_$env.sql"
+
+  # 1. Check if the previous standard dump file already exists
+  if [[ -f "$target_file" ]]; then
+    # Get file modification date formatted as YYYYMMDD_HHMMSS
+    # (Works seamlessly on Ubuntu/Linux)
+    local file_date=$(date -r "$target_file" +"%Y%m%d_%H%M%S" 2>/dev/null || stat -c %Y "$target_file" | xargs -I {} date -d @{} +"%Y%m%d_%H%M%S")
+    local archived_file="$project_path/${file_date}_db_dump_$env.sql"
+    
+    # Rename it by adding the prefix
+    mv "$target_file" "$archived_file"
+  fi
+
+  # 2. Manage rotation: keep a maximum of 3 dumps total (including the new one about to be built)
+  # Because we want exactly 3 versions MAX, if we already have 3 archived versions, we delete the oldest
+  # before generating the new standard one.
+  local backup_list=($(ls -1 $project_path/*_db_dump_$env.sql 2>/dev/null | sort))
   
-  "${cmd[@]}" > "$project_path/db_dump_$env.sql"
+  if [[ ${#backup_list[@]} -ge 3 ]]; then
+    # The oldest file is always the first item because of alphabetical sorting by YYYYMMDD prefix
+    rm -f "${backup_list[0]}"
+  fi
+  # --- ROTATION LOGIC END ---
+  
+  # 3. Create the new dump using the standard filename (clean, no prefix)
+  "${cmd[@]}" > "$target_file"
 }
+
 
 # load
 load_orb=(
